@@ -40,3 +40,69 @@ git clone [https://github.com/hokagelegend9999/bot_store.git](https://github.com
 cd bot_store
 chmod +x install.sh
 ./install.sh
+
+
+
+=======================================================
+
+⚙️ Konfigurasi
+Setelah instalasi selesai, Anda WAJIB mengedit file konfigurasi untuk memasukkan Token Bot dan API Key Anda.
+
+Buka file config:
+
+Bash
+
+nano config.py
+Isi data berikut:
+
+BOT_TOKEN: Token dari @BotFather.
+
+ADMIN_ID: ID Telegram Anda (Owner).
+
+ATLANTIC_API_KEY: API Key Provider PPOB.
+
+SMTP_EMAIL: Email untuk pengiriman backup.
+
+Restart bot setelah edit:
+
+Bash
+
+systemctl restart bot-store
+📜 Perintah Berguna
+Cek Log (Jika ada error):
+
+Bash
+
+journalctl -u bot-store -f
+Stop Bot:
+
+Bash
+
+systemctl stop bot-store
+Update Bot (Ambil update terbaru dari GitHub):
+
+Bash
+
+cd /root/bot_store
+git pull
+systemctl restart bot-store
+Developed by Hokage Legend
+
+
+---
+
+### Apa yang harus Anda lakukan sekarang?
+
+1.  **Di Komputer/VPS Anda saat ini:**
+    * Buat file `requirements.txt`.
+    * Buat file `install.sh`.
+    * Buat file `README.md`.
+2.  **Upload ke GitHub:**
+    Jalankan perintah ini di folder bot Anda untuk mengupdate GitHub:
+    ```bash
+    git add .
+    git commit -m "Add installer and readme"
+    git push origin main
+    ```
+
+Setelah itu, jika Anda punya VPS baru, Anda tinggal copy-paste perintah di bagian **"Cara Install"*
