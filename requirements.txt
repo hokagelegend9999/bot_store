@@ -1,0 +1,6 @@
+pyTelegramBotAPI
+requests
+pandas
+openpyxl
+schedule
+psutil
