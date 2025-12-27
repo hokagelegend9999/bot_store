@@ -1,0 +1,5 @@
+systemctl restart bot-store
+
+
+journalctl -u bot-store -f
+

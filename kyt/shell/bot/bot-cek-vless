@@ -1,0 +1,47 @@
+#!/bin/bash
+# Script Cek VLESS (REVISI: Sesuaikan Tag dengan Panel)
+
+# 1. Paksa baca config.json saja agar sinkron dengan Panel VPS
+# (Database .vless.db seringkali tidak update/kosong, jadi kita bypass saja)
+DB_FILE="/etc/xray/config.json"
+
+# 2. Ambil List User (GANTI GREP DARI '###' MENJADI '#&')
+# Panel Anda mendefinisikan VLESS dengan tag "#&"
+users=$(grep '^#&' "$DB_FILE" | awk '{print $2}' | sort | uniq)
+
+# 3. Loop logic tetap sama...
+for user in $users
+do
+    if [[ -z "$user" ]]; then
+        continue
+    fi
+
+    # Ganti grep di sini juga menjadi "#&"
+    exp=$(grep -w "^#& $user" "$DB_FILE" | awk '{print $3}' | head -n 1)
+    
+    # ... sisa script ke bawah biarkan sama ...
+    
+    # --- Cek Usage (Kuota) ---
+    usage_file="/etc/xray/limit/vless/$user"
+    if [[ ! -f "$usage_file" ]]; then
+        usage_file="/etc/vless/$user"
+    fi
+
+    if [ -f "$usage_file" ]; then
+        byte=$(cat "$usage_file")
+        usage=$(numfmt --to=iec-i --suffix=B "$byte" 2>/dev/null || echo "$byte")
+    else
+        usage="0B"
+    fi
+    
+    limit="Unlimited"
+    
+    log_file="/var/log/xray/access.log"
+    if [ -f "$log_file" ]; then
+        ip=$(tail -n 500 "$log_file" | grep "email: $user" | grep "accepted" | awk '{print $3}' | cut -d: -f1 | sort | uniq | wc -l)
+    else
+        ip=0
+    fi
+    
+    echo "$user|$usage|$limit|$ip|$exp"
+done

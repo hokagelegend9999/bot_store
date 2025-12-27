@@ -1,0 +1,5 @@
+BOT_TOKEN="8537615254:AAH8TxILi9ZiMwCKqn_FI73SJmBqr2glPds"
+ADMIN="1469244768"
+DOMAIN="id.hokagelegend.web.id"
+PUB=""
+HOST="ns.7u245ep.profesorhokage.my.id"

@@ -1,0 +1,39 @@
+#!/bin/bash
+# Script Cek Trojan (Tag #!)
+
+DB_FILE="/etc/xray/config.json"
+
+# Ambil user dengan awalan #! 
+users=$(grep '^#!' "$DB_FILE" | awk '{print $2}' | sort | uniq)
+
+echo "----------------------------------------"
+echo "  USER | EXP | QUOTA | IP"
+echo "----------------------------------------"
+
+for user in $users
+do
+    if [[ -z "$user" ]]; then continue; fi
+
+    # Ambil Expired (Baris #!)
+    exp=$(grep -w "^#! $user" "$DB_FILE" | awk '{print $3}' | head -n 1)
+
+    # Cek Limit
+    usage_file="/etc/xray/limit/trojan/$user"
+    if [ -f "$usage_file" ]; then
+        byte=$(cat "$usage_file")
+        usage=$(numfmt --to=iec-i --suffix=B "$byte" 2>/dev/null || echo "$byte")
+    else
+        usage="0B"
+    fi
+
+    # Cek IP Login
+    log_file="/var/log/xray/access.log"
+    if [ -f "$log_file" ]; then
+        ip=$(tail -n 500 "$log_file" | grep "trojan" | grep "email: $user" | awk '{print $3}' | cut -d: -f1 | sort | uniq | wc -l)
+    else
+        ip=0
+    fi
+
+    echo "$user | $exp | $usage | $ip"
+done
+echo "----------------------------------------"

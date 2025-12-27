@@ -1,0 +1,207 @@
+#!/bin/bash
+# //====================================================
+# //	System Request:Debian 9+/Ubuntu 18.04+/20+
+# //	Develovers >   HOKAGE
+# //	email > hokagelegend9999@gmail.com
+# //    telegram > @HookageLegend
+# //    whatsapp > 087726917005
+# //====================================================
+# // LUNATIC TUNNELING
+# COLOR VALIDATION
+
+RED='\033[0;31m'
+NC='\033[0m'
+gray="\e[1;30m"
+Blue="\033[36m"
+GREEN='\033[0;32m'
+grenbo="\e[92;1m"
+yellow='\033[0;33m'
+ISP=$(cat /etc/xray/isp)
+CITY=$(cat /etc/xray/city)
+domain=$(cat /etc/xray/domain)
+WKT=$(curl -s ipinfo.io/timezone)
+IPVPS=$(curl -s ipv4.icanhazip.com)
+tram=$(free -m | awk 'NR==2 {print $2}')
+swap=$(free -m | awk 'NR==4 {print $2}')
+freq=$(awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo)
+cores=$(awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo)
+cname=$(awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo)
+Exp=$(curl -sS https://github.com/hokagelegend9999/ijin/raw/refs/heads/main/alpha | grep $IPVPS | awk '{print $3}')
+Name=$(curl -sS https://github.com/hokagelegend9999/ijin/raw/refs/heads/main/alpha | grep $IPVPS | awk '{print $2}')
+Open_SSH=$(systemctl is-active ssh)
+Dropbear=$(systemctl is-active dropbear)
+Dropbear_Websocket=$(systemctl is-active dropbear)
+SSH_Websocket=$(systemctl is-active ws)
+OpenVPN=$(systemctl is-active openvpn)
+Nginx_Webserver=$(systemctl is-active nginx)
+Haproxy=$(systemctl is-active haproxy)
+OpenVPN_Websocket=$(systemctl is-active ws)
+# Menggunakan satu variabel untuk semua layanan Xray karena semua dikelola oleh 'xray.service'
+xray_status=$(systemctl is-active xray.service)
+Iptables=$(systemctl is-active netfilter-persistent)
+Squid=$(systemctl is-active squid)
+RClocal=$(systemctl is-active rc-local)
+Autorebot=$(systemctl is-active rc-local)
+OSSSS=$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')
+
+if [[ "$Open_SSH" == "active" ]]; then
+    status_1="🟢 Online"
+else
+    status_1="🔴 Offline"
+fi
+
+if [[ "$Dropbear" == "active" ]]; then
+    status_2="🟢 Online"
+else
+    status_2="🔴 Offline"
+fi
+
+if [[ "$Dropbear_Websocket" == "active" ]]; then
+    status_3="🟢 Online"
+else
+    status_3="🔴 Offline"
+fi
+
+if [[ "$SSH_Websocket" == "active" ]]; then
+    status_4="🟢 Online"
+else
+    status_4="🔴 Offline"
+fi
+
+if [[ "$OpenVPN" == "active" ]]; then
+    status_5="🟢 Online"
+else
+    status_5="🔴 Offline"
+fi
+
+if [[ "$Nginx_Webserver" == "active" ]]; then
+    status_6="🟢 Online"
+else
+    status_6="🔴 Offline"
+fi
+
+if [[ "$Haproxy" == "active" ]]; then
+    status_7="🟢 Online"
+else
+    status_7="🔴 Offline"
+fi
+
+if [[ "$OpenVPN_Websocket" == "active" ]]; then
+    status_10="🟢 Online"
+else
+    status_10="🔴 Offline"
+fi
+
+# Menggunakan status Xray yang sudah di cek di awal skrip
+if [[ "$xray_status" == "active" ]]; then
+    status_11="🟢 Online"
+else
+    status_11="🔴 Offline"
+fi
+
+if [[ "$xray_status" == "active" ]]; then
+    status_12="🟢 Online"
+else
+    status_12="🔴 Offline"
+fi
+
+if [[ "$xray_status" == "active" ]]; then
+    status_13="🟢 Online"
+else
+    status_13="🔴 Offline"
+fi
+
+if [[ "$xray_status" == "active" ]]; then
+    status_14="🟢 Online"
+else
+    status_14="🔴 Offline"
+fi
+
+if [[ "$xray_status" == "active" ]]; then
+    status_15="🟢 Online"
+else
+    status_15="🔴 Offline"
+fi
+
+if [[ "$xray_status" == "active" ]]; then
+    status_16="🟢 Online"
+else
+    status_16="🔴 Offline"
+fi
+
+if [[ "$xray_status" == "active" ]]; then
+    status_17="🟢 Online"
+else
+    status_17="🔴 Offline"
+fi
+
+if [[ "$xray_status" == "active" ]]; then
+    status_18="🟢 Online"
+else
+    status_18="🔴 Offline"
+fi
+
+if [[ "$xray_status" == "active" ]]; then
+    status_19="🟢 Online"
+else
+    status_19="🔴 Offline"
+fi
+
+if [[ "$xray_status" == "active" ]]; then
+    status_20="🟢 Online"
+else
+    status_20="🔴 Offline"
+fi
+
+if [[ "$Iptables" == "active" ]]; then
+    status_21="🟢 Online"
+else
+    status_21="🔴 Offline"
+fi
+
+if [[ "$Squid" == "active" ]]; then
+    status_22="🟢 Online"
+else
+    status_22="🔴 Offline"
+fi
+
+
+if [[ "$RClocal" == "active" ]]; then
+    status_24="🟢 Online"
+else
+    status_24="🔴 Offline"
+fi
+
+if [[ "$Autorebot" == "active" ]]; then
+    status_25="🟢 Online"
+else
+    status_25="🔴 Offline"
+fi
+printf "
+◇━━━━━━━━━━━━━━━━━━━━━━━◇
+  🔥⇱ Service Info ⇲🔥   
+◇━━━━━━━━━━━━━━━━━━━━━━━◇
+Open_SSH        : $status_1
+Dropbear        : $status_2
+Dropbear_WS     : $status_3
+SSH_Websocket   : $status_4
+OpenVPN         : $status_5
+Nginx_Webserver : $status_6
+Haproxy         : $status_7
+OpenVPN_WS      : $status_10
+Xray_Vmess_TLS  : $status_11
+Xray_Vmess_gRPC : $status_12
+Xray_Vmess_NTLS : $status_13
+Xray_Vless_TLS  : $status_14
+Xray_Vless_gRPC : $status_15
+Xray_Vless_NTLS : $status_16
+Trojan_gRPC     : $status_17
+Trojan_WS       : $status_18
+Shadowsocks_WS  : $status_19
+Shadowsocks_gRPC: $status_20
+Iptables        : $status_21
+Squid           : $status_22
+RClocal         : $status_24
+Autoreboot      : $status_25
+◇━━━━━━━━━━━━━━━━━━━━━━━◇
+"

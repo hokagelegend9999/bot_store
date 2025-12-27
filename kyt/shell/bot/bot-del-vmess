@@ -1,0 +1,39 @@
+#!/bin/bash
+# Script Hapus Vmess (Adaptasi Mutlak dari delws)
+# Fix by Gemini
+
+# 1. Ambil Username dari Bot (Pengganti read -rp)
+user="$1"
+if [ -z "$user" ]; then
+    echo "Error: Username tidak terdeteksi."
+    exit 1
+fi
+
+# 2. Ambil Tanggal Expired (Sesuai logika delws)
+# Diperlukan karena sed Anda menggunakan pola "$user $exp"
+# head -n 1 saya tambahkan agar jika ada user ganda, script tidak error (mengambil yang pertama)
+exp=$(grep -wE "^### $user" "/etc/xray/config.json" | cut -d ' ' -f 3 | sort | uniq | head -n 1)
+
+if [ -z "$exp" ]; then
+    echo "Error: User $user tidak ditemukan atau format salah."
+    exit 1
+fi
+
+# 3. Eksekusi Penghapusan (Logic asli delws)
+
+# Hapus dari Config Xray
+sed -i "/^### $user $exp/,/^},{/d" /etc/xray/config.json
+
+# Hapus dari Database Backup
+sed -i "/^### $user $exp/,/^},{/d" /etc/vmess/.vmess.db
+
+# Hapus Log/Limit Usage (Sesuai path delws)
+rm -rf /etc/vmess/$user
+
+# Hapus Limit IP (Sesuai path delws / hokage script)
+rm -rf /etc/hokage/limit/vmess/ip/$user
+
+# 4. Restart Xray
+systemctl restart xray > /dev/null 2>&1
+
+echo "Berhasil menghapus user: $user"

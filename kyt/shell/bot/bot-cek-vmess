@@ -1,0 +1,61 @@
+#!/bin/bash
+# Script Cek Vmess (Anti-Duplicate & Fix)
+# Fix by Gemini
+
+# --- HELPER: Konversi Bytes ke Human Readable ---
+function convert() {
+    local -i bytes=$1
+    if [[ $bytes -lt 1024 ]]; then echo "${bytes}B"
+    elif [[ $bytes -lt 1048576 ]]; then echo "$(((bytes + 1023) / 1024))KB"
+    elif [[ $bytes -lt 1073741824 ]]; then echo "$(((bytes + 1048575) / 1048576))MB"
+    else echo "$(((bytes + 1073741823) / 1073741824))GB"
+    fi
+}
+
+# --- 1. DETEKSI LOKASI CONFIG ---
+if [ -f "/etc/xray/config.json" ]; then
+    CONFIG="/etc/xray/config.json"
+elif [ -f "/usr/local/etc/xray/config.json" ]; then
+    CONFIG="/usr/local/etc/xray/config.json"
+else
+    exit 1
+fi
+
+# --- 2. AMBIL LIST USER (DENGAN FILTER ANTI-DUPLICATE) ---
+# Penambahan "sort | uniq" akan membuang baris yang kembar
+grep -E "^### " "$CONFIG" | cut -d ' ' -f 2-3 | sort | uniq | while read -r userexp; do
+    
+    # Pisahkan User dan Expired
+    user=$(echo $userexp | awk '{print $1}')
+    exp_date=$(echo $userexp | awk '{print $2}')
+    
+    # Default Values
+    gb="0B"
+    lim="Unlimited"
+    ip_count="0"
+    
+    # Jika exp kosong, set Unlimited
+    if [[ -z "$exp_date" ]]; then exp_date="Unlimited"; fi
+
+    # --- 3. CEK USAGE (QUOTA) ---
+    if [[ -e /etc/xray/quota/${user} ]]; then
+        byt=$(cat /etc/xray/quota/${user})
+        gb=$(convert ${byt})
+    elif [[ -e /etc/limit/vmess/${user} ]]; then
+        byt=$(cat /etc/limit/vmess/${user})
+        gb=$(convert ${byt})
+    elif [[ -e /var/lib/premium-script/data-user-l2tp/${user} ]]; then
+        byt=$(cat /var/lib/premium-script/data-user-l2tp/${user})
+        gb=$(convert ${byt})
+    fi
+
+    # --- 4. CEK IP LOGIN ---
+    LOG_FILE="/var/log/xray/access.log"
+    if [ -f "$LOG_FILE" ]; then
+        ip_count=$(tail -n 500 "$LOG_FILE" | grep -w "email: ${user}" | awk '{print $3}' | cut -d: -f1 | sort | uniq | wc -l)
+    fi
+
+    # --- 5. OUTPUT FINAL ---
+    echo "$user|$gb|$lim|$ip_count|$exp_date"
+
+done

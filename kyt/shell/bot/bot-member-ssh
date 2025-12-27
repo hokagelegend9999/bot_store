@@ -1,0 +1,29 @@
+#!/bin/bash
+# RAW DATA OUTPUT (JANGAN DIHIAS)
+# Format: username|expired|status
+
+while read expired; do
+    # Ambil Username & ID
+    AKUN="$(echo $expired | cut -d: -f1)"
+    ID="$(echo $expired | grep -v nobody | cut -d: -f3)"
+    
+    # Filter hanya user manusia (UID >= 1000)
+    if [[ $ID -ge 1000 ]]; then
+        
+        # 1. Ambil Expired Date
+        exp_raw="$(chage -l $AKUN | grep "Account expires" | cut -d: -f2)"
+        exp="$(echo $exp_raw | sed 's/^ *//g')"
+        
+        # 2. Ambil Status
+        status_check="$(passwd -S $AKUN | awk '{print $2}')"
+        if [[ "$status_check" = "L" ]]; then
+            STAT="LOCKED"
+        else
+            STAT="UNLOCKED"
+        fi
+        
+        # 3. OUTPUT RAW (SATU BARIS PER USER)
+        # Dipisah dengan tanda |
+        echo "$AKUN|$exp|$STAT"
+    fi
+done < /etc/passwd

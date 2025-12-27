@@ -1,0 +1,97 @@
+#!/bin/bash
+# HYBRID SCRIPT: Logic from User + Output for Python Bot
+# Created by Gemini
+
+# 1. TANGKAP INPUT
+EMAIL_TUJUAN=$1
+if [[ -z "$EMAIL_TUJUAN" ]]; then
+    EMAIL_TUJUAN="no-email@detected.com"
+fi
+
+# 2. VARIABEL & INFO VPS (Auto Detect)
+IP=$(curl -sS ipv4.icanhazip.com)
+DATE=$(date +"%Y-%m-%d")
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+
+# Ambil Domain/ISP (Prioritas Auto Detect agar akurat)
+HOST=$(cat /etc/xray/domain 2>/dev/null)
+if [[ -z "$HOST" ]]; then HOST=$IP; fi
+
+# Deteksi ISP & City via API
+API_DATA=$(curl -s http://ip-api.com/json/$IP)
+ISPVPS=$(echo $API_DATA | python3 -c "import sys, json; print(json.load(sys.stdin).get('isp', 'Unknown ISP'))" 2>/dev/null)
+CITY=$(echo $API_DATA | python3 -c "import sys, json; print(json.load(sys.stdin).get('city', 'Unknown City'))" 2>/dev/null)
+
+# 3. PERSIAPAN FOLDER BACKUP (Logic Baru)
+BACKUP_DIR="/root/backup_${TIMESTAMP}"
+ZIP_NAME="backup_${IP}_${TIMESTAMP}.zip"
+
+mkdir -p "$BACKUP_DIR"
+
+# 4. PROSES COPY FILE (Sesuai Request Script Anda)
+# Copy File Penting
+cp "/etc/passwd" "$BACKUP_DIR/" 2>/dev/null
+cp "/etc/group" "$BACKUP_DIR/" 2>/dev/null
+cp "/etc/shadow" "$BACKUP_DIR/" 2>/dev/null
+cp "/etc/gshadow" "$BACKUP_DIR/" 2>/dev/null
+cp "/etc/crontab" "$BACKUP_DIR/" 2>/dev/null
+
+# Copy Direktori Penting
+# Xray, KYT, Web
+cp -r /etc/xray "$BACKUP_DIR/xray" 2>/dev/null
+cp -r /var/lib/kyt "$BACKUP_DIR/kyt" 2>/dev/null
+mkdir -p "$BACKUP_DIR/html"
+cp -r /var/www/html/* "$BACKUP_DIR/html/" 2>/dev/null
+
+# Copy Database SSH/VPN (Jika ada)
+[ -f /etc/ssh/.ssh.db ] && cp /etc/ssh/.ssh.db "$BACKUP_DIR/ssh.db"
+[ -f /etc/vmess/.vmess.db ] && cp /etc/vmess/.vmess.db "$BACKUP_DIR/vmess.db"
+[ -f /etc/vless/.vless.db ] && cp /etc/vless/.vless.db "$BACKUP_DIR/vless.db"
+[ -f /etc/trojan/.trojan.db ] && cp /etc/trojan/.trojan.db "$BACKUP_DIR/trojan.db"
+[ -f /etc/shadowsocks/.shadowsocks.db ] && cp /etc/shadowsocks/.shadowsocks.db "$BACKUP_DIR/shadowsocks.db"
+
+# 5. KOMPRESI (ZIP)
+cd /root
+zip -r "$ZIP_NAME" "backup_${TIMESTAMP}" > /dev/null 2>&1
+
+# 6. UPLOAD KE GOOGLE DRIVE
+# Menggunakan remote 'dr' sesuai settingan awal Anda
+rclone copy "$ZIP_NAME" dr:backup/ > /dev/null 2>&1
+
+# Ambil Link Download
+url=$(rclone link dr:backup/"$ZIP_NAME" 2>/dev/null)
+if [[ "$url" =~ "id=" ]]; then
+    id=$(echo "$url" | grep -oP 'id=\K[^&]+')
+    LINKBACKUP="https://drive.google.com/u/4/uc?id=${id}&export=download"
+else
+    LINKBACKUP="Gagal/Limit Google Drive"
+fi
+
+# 7. KIRIM EMAIL (Silent Mode - Tidak tampil di bot tapi terkirim)
+EMAIL_CONTENT="
+Detail Backup VPS
+==================================
+IP VPS        : $IP
+Link Backup   : $LINKBACKUP
+Tanggal       : $DATE
+File Backup   : $ZIP_NAME
+==================================
+HOKAGE LEGEND STORE
+"
+if command -v mail &> /dev/null; then
+    echo "$EMAIL_CONTENT" | mail -s "Backup Data $DATE" "$EMAIL_TUJUAN" >/dev/null 2>&1
+fi
+
+# 8. BERSIH-BERSIH
+rm -rf "$BACKUP_DIR"
+rm -f "/root/$ZIP_NAME"
+
+# 9. OUTPUT DATA UNTUK PYTHON BOT (WAJIB ADA)
+# Ini yang membuat tampilan di Telegram tetap bagus
+echo "IP: $IP"
+echo "Domain: $HOST"
+echo "ISP: $ISPVPS"
+echo "Location: $CITY"
+echo "Link: $LINKBACKUP"
+
+exit 0
