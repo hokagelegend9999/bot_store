@@ -8,7 +8,7 @@ NC='\033[0m'
 
 echo -e "${GREEN}============================================${NC}"
 echo -e "${GREEN}    INSTALLER BOT STORE & VPS MANAGER       ${NC}"
-echo -e "${GREEN}         By: Hokage Legend                  ${NC}"
+echo -e "${GREEN}          By: Hokage Legend                 ${NC}"
 echo -e "${GREEN}============================================${NC}"
 
 # 1. Cek Root
@@ -31,7 +31,7 @@ if [ -d "$DIR" ]; then
   git pull
 else
   echo -e "${YELLOW}📥 Mengunduh Repository dari GitHub...${NC}"
-  # Ganti URL ini jika repository anda private atau berubah
+  # Clone repo
   git clone https://github.com/hokagelegend9999/bot_store.git $DIR
   cd $DIR
 fi
@@ -72,5 +72,5 @@ echo -e "📂 Lokasi Bot: /root/bot_store"
 echo -e "📝 Edit Config: nano /root/bot_store/config.py"
 echo -e "▶️  Cek Status : systemctl status bot-store"
 echo -e "🔄 Restart Bot: systemctl restart bot-store"
-echo -e "📜 Cek Logs   : journalctl -u bot-store -f"
+echo -e "📜 Cek Logs    : journalctl -u bot-store -f"
 echo -e "${GREEN}============================================${NC}"
